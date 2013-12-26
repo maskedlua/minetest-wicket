@@ -24,6 +24,10 @@ use DBD::mysql;         # DBI driver for MySQL
 
 # Pseudo-globals
 
+# Compiled regexes
+our $QRFALSE            = qr/\A0?\z/            ;
+our $QRTRUE             = qr/\A(?!$QRFALSE)/    ;
+
 ## pseudo-globals
 #----------------------------------------------------------------------------#
 
@@ -36,7 +40,7 @@ __END__
 
 =head1 NAME
 
-Local::Wicket - .................. 44 chars in PAUSE upload!
+Local::Wicket - Minetest-Mediawiki bridge
 
 =head1 VERSION
 
@@ -50,23 +54,22 @@ This document describes Local::Wicket version v0.0.0
 
 =over
 
-I<< Anyone can tell the truth,  >> 
-I<< but only very few of us can make epigrams. >> 
--- W. Somerset Maugham
+I<< One day the war will be over. And I hope that the people that use >> 
+I<< this bridge in years to come will remember how it was built >>
+I<< and who built it. >> 
+-- Lt. Colonel Nicholson
 
 =back
 
-=head1 METHODS 
+
+
+=head1 PUBLIC FUNCTIONS 
 
 =head2 new()
 
-=head1 ACCSESSORS
+=head1 PRIVATE FUNCTIONS
 
-Object-oriented accessor methods are provided for each parameter and result. 
-They all do just what you'd expect. 
-
-    $self               = $self->put_attr($string);
-    $string             = $self->get_attr();
+No user-accessible parts in here. 
 
 =head1 SEE ALSO
 
@@ -74,7 +77,7 @@ L<< Some::Module|Some::Module >>
 
 =head1 INSTALLATION
 
-This module is installed using L<< Module::Build|Module::Build >>. 
+Do not install this module at all. It's only meaningful as part of the 'wicket' Minetest mod (addon, plugin, extension). Refer to mod docs. 
 
 =head1 DIAGNOSTICS
 
@@ -117,8 +120,8 @@ Perl extension for Version Objects
 
 =end html
 
-This module should work with any version of perl 5.8.8 and up. 
-However, you may need to upgrade some core modules. 
+This module requires perl 5.14.2;
+maybe exactly perl (5.14.2-21+deb7u1). 
 
 =head1 INCOMPATIBILITIES
 
@@ -129,12 +132,12 @@ None known.
 This is an early release. Reports and suggestions will be warmly welcomed. 
 
 Please report any issues to: 
-L<https://github.com/Xiong/devel-toolbox/issues>.
+L<https://github.com/Xiong/minetest-wicket/issues>.
 
 =head1 DEVELOPMENT
 
 This project is hosted on GitHub at: 
-L<https://github.com/Xiong/devel-toolbox>. 
+L<https://github.com/Xiong/minetest-wicket>. 
 
 =head1 THANKS
 
