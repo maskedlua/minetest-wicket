@@ -54,9 +54,7 @@ This document describes Local::Wicket version v0.0.0
 
 =over
 
-I<< One day the war will be over. And I hope that the people that use >> 
-I<< this bridge in years to come will remember how it was built >>
-I<< and who built it. >> 
+I< One day the war will be over. > 
 -- Lt. Colonel Nicholson
 
 =back
