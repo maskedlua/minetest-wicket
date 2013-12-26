@@ -75,7 +75,8 @@ $dbh = DBI->connect( $dsn, $dbuser, $dbpass );
 
 # Compose insert. 
 $statement  = qq{INSERT INTO $dbtable VALUES (}
-            ( join q{,},
+            . ( 
+            join q{,},
                 '0',                            # user_id (auto_increment)
                 $username,                      # user_name
             )
