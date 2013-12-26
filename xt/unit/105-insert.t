@@ -46,7 +46,7 @@ my @td  = (
 #----------------------------------------------------------------------------#
 
 my $tc          ;
-my $base        = 'Local::Wicket: _insert';
+my $base        = 'Local::Wicket: _insert ';
 my $diag        = $base;
 my @rv          ;
 my $got         ;
@@ -73,11 +73,17 @@ for (@td) {
         $diag           = 'execute';
         @rv             = eval{ Local::Wicket::_insert(@args) };
         pass( $diag );          # test didn't blow up
-#~         note($@) if $@;         # did code under test blow up?
+        my $err         = $@;
+        note($err) if $err;     # did code under test blow up?
+        
+        if ( $err and not $die ) {
+            $diag           = 'eval error';
+            fail( $diag );
+        };
         
         if    ($die) {
             $diag           = 'should throw';
-            $got            = $@;
+            $got            = $err;
             $want           = $die;
             like( $got, $want, $diag );
         }
