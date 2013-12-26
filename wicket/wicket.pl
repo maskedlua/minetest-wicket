@@ -8,37 +8,23 @@ use strict;
 use warnings;
 use version; our $VERSION = qv('0.0.0');
 
-# Core modules
-use Getopt::Long;                           # Parses command-line options
-Getopt::Long::Configure ("bundling");       # enable, for instance, -xyz
-use Pod::Usage;                             # Build help text from POD
-use Pod::Find qw{pod_where};                # POD is in ...
+# Core module
+use lib qw| lib |;
 
-use Digest::MD5 qw(md5 md5_hex md5_base64);     # MD5 hashing
-
-
-# Modules standard with wheezy
-use DBI 1.616;          # Generic interface to a large number of databases
-use DBD::mysql;         # DBI driver for MySQL
-
-
-# Disabled
-#~ use lib qw| lib |;
-#~ use Error::Base;
-#~ use Perl6::Form;
-#~ use Test::More;
-#~ use Test::Trap;
-
-#~ use Devel::Comments '###';
-#~ use Devel::Comments '###', ({ -file => 'debug.log' });                   #~
-
-#~ use DBIx::Connector; # Fast, safe DBI connection and transaction management
-#~ use DBIx::Connector::Driver::SQLite; # SQLite-specific connection interface
-
+# Project module
+use Local::Wicket;
 
 ## use
 #============================================================================#
 say "$0 Running...";
+
+
+
+say "Done.";
+exit;
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+=pod
 
 # Quickie grab from command line for security.
 my @grab            = @ARGV;
