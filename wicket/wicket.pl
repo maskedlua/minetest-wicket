@@ -74,12 +74,11 @@ $dbh = DBI->connect( $dsn, $dbuser, $dbpass );
 #~ $sth->finish();
 
 # Compose insert. 
-$statement  = qq{INSERT INTO $dbtable VALUES (}
-            . ( 
-            join q{,},
-                '0',                            # user_id (auto_increment)
-                $dbh->quote($username),         # user_name
-            )
+$statement  = qq{INSERT INTO $dbtable }
+            . q{(user_id, user_name) }
+            . q{VALUES (}
+            .  q{'0',}                          # user_id (auto_increment)
+            . qq{$dbh->quote($username),}       # user_name
             .  q{)}
             ;
 $dbh->do( $statement );
