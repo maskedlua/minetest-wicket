@@ -5,8 +5,16 @@ use warnings;
 use version; our $VERSION = qv('v0.0.0');
 
 # Core modules
+use Getopt::Long;                           # Parses command-line options
+Getopt::Long::Configure ("bundling");       # enable, for instance, -xyz
+use Pod::Usage;                             # Build help text from POD
+use Pod::Find qw{pod_where};                # POD is in ...
 
-# CPAN modules
+use Digest::MD5 qw(md5 md5_hex md5_base64);     # MD5 hashing
+
+# Modules standard with wheezy
+use DBI 1.616;          # Generic interface to a large number of databases
+use DBD::mysql;         # DBI driver for MySQL
 
 # Alternate uses
 #~ use Devel::Comments '###', ({ -file => 'debug.log' });                   #~
