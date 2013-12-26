@@ -78,18 +78,17 @@ $statement  = qq{INSERT INTO $dbtable }
             . q{(user_id, user_name) }
             . q{VALUES (}
             .  q{'0',}                          # user_id (auto_increment)
-            . qq{$dbh->quote($username),}       # user_name
+            . $dbh->quote($username)            # user_name
             .  q{)}
             ;
 $dbh->do( $statement );
 
 # Set password.
 $statement  = qq{UPDATE $dbtable SET user_password=}
-            .  q{md5(concat(user_id,'-',md5('}
+            .  q{md5(concat(user_id,'-',md5(}
             . $dbh->quote($password)
-            .  q{'))) WHERE user_name ='}
+            .  q{))) WHERE user_name =}
             . $dbh->quote($username)
-            .  q{'}
             ;
 $dbh->do( $statement );
 
