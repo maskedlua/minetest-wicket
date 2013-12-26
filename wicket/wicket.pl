@@ -55,19 +55,7 @@ my $dbuser          = 'wiki';
 
 my $dsn             = "DBI:mysql:database=$dbname;host=$dbhost";
 my $dbh             ;
-
-#~     # Probe.
-#~ my @drivers         = DBI->available_drivers();
-#~ say 'Drivers:';
-#~ for my $driver (@drivers) {
-#~     say $driver;
-#~     my @sources         = DBI->data_sources($driver);
-#~     for my $source (@sources) {
-#~         say $indent . $source;
-#~     };
-#~     say q{};
-#~ };
-#~ say q{};
+my $sth             ;
 
 
     # Test insert the user and set password.
@@ -75,6 +63,13 @@ my $dbh             ;
 # Connect to the DB.
 $dbh = DBI->connect( $dsn, $dbuser, $dbpass );
 
+# Test query (ripped from DBD::mysql POD).
+$sth    = $dbh->prepare("SELECT * FROM athensuser");
+$sth->execute();
+while (my $ref = $sth->fetchrow_hashref()) {
+    print "Found a row: id = $ref->{'user_id'}, name = $ref->{'user_name'}\n";
+}
+$sth->finish();
 
 
 $dbh->disconnect();
