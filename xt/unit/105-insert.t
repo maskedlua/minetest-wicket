@@ -84,13 +84,16 @@ my @td  = (
         -case   => 'query select',
         -code   => q[
             my $sth;
+            my @rv;
             $sth = $dbh->prepare("SELECT * FROM $dbtable");
             $sth->execute();
             while ( my $ref = $sth->fetchrow_hashref() ) {
-                note( "Row: $ref->{'user_id'}, $ref->{'user_name'}" );
+                push @rv, "$ref->{'user_id'}, $ref->{'user_name'}";
             }
             $sth->finish();
+            return @rv;
         ],
+        -like   => words( '1', $username ),
     },
     
 #~     {
