@@ -13,6 +13,12 @@ my $QRFALSE      = $Local::Wicket::QRFALSE   ;
 # Create a test database and do a test user insert.
 #----------------------------------------------------------------------------#
 # SETUP
+my $username    = 'Joe';                # (game) user to insert
+my $password    = 'flimflam';           # temporary password given to user
+my $dbname      = 'test';               # name of the wiki's MySQL DB
+my $dbuser      = 'testdbuser';         # same as the wiki's DB user
+my $dbpass      = 'testdbpass';         # DB password for above
+my $dbtable     = 'test_users';         # name of the "user" table
 
 
 #----------------------------------------------------------------------------#
@@ -21,15 +27,35 @@ my $QRFALSE      = $Local::Wicket::QRFALSE   ;
 my @td  = (
     {
         -case   => 'null',
-        -want   => $QRFALSE,
+        -like   => $QRTRUE,
     },
     
-#~     {
-#~         -case   => 'one',
-#~         -args   => [ 0 ],
-#~         -die    => words(qw/ internal error unpaired /),
-#~     },
-#~     
+    {
+        -case   => 'Joe',
+        -args   => [ 
+            username    => $username,   # 
+            password    => $password,   # 
+            dbname      => $dbname,     # 
+            dbuser      => $dbuser,     # 
+            dbpass      => $dbpass,     # 
+            dbtable     => $dbtable,    # 
+        ],
+        -like   => $QRTRUE,
+    },
+    
+    {
+        -case   => 'Freddy',
+        -args   => [ 
+            username    => $username,   # 
+            password    => $password,   # 
+            dbname      => $dbname,     # 
+            dbuser      => 'Freddy',    # BAD
+            dbpass      => $dbpass,     # 
+            dbtable     => $dbtable,    # 
+        ],
+        -die    => words(qw/ error /),
+    },
+    
 #~     {
 #~         -case   => 'two',
 #~         -args   => [ 0, 1 ],
@@ -72,8 +98,9 @@ for (@td) {
     subtest $case => sub {
         
         my @args        = eval{ @{ $t{-args} } };
-        my $die         = $t{-die};
-        my $want        = $t{-want};
+        my $die         = $t{-die};     # must fail
+        my $like        = $t{-like};    # regex supplied
+        my $need        = $t{-need};    # exact return value supplied
         
         $diag           = 'execute';
         @rv             = eval{ Local::Wicket::_insert(@args) };
@@ -92,15 +119,16 @@ for (@td) {
             $want           = $die;
             like( $got, $want, $diag );
         }
-        elsif ($want) {
+        elsif ($like) {
             $diag           = 'return-like';
             $got            = join qq{\n}, @rv;
+            $want           = $like;
             like( $got, $want, $diag );
         } 
-        else {
+        elsif ($need) {
             $diag           = 'return-is';
-            $got            = join qq{\n}, @rv;
-            $want           = join qq{\n}, @args;
+            $got            = $rv[0];
+            $want           = $need;
             is( $got, $want, $diag );
         };
         

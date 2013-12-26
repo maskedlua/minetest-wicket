@@ -35,7 +35,7 @@ our $QRTRUE             = qr/\A(?!$QRFALSE)/    ;
 #
 #~     _insert({       # insert this user directly into the wiki database
 #~         username    => $username,   # (game) user to insert
-#~         password    => $password,   # temporary password given to game user
+#~         password    => $password,   # temporary password given to user
 #~         dbname      => $dbname,     # name of the wiki's MySQL DB
 #~         dbuser      => $dbuser,     # same as the wiki's DB user
 #~         dbpass      => $dbpass,     # DB password for above
@@ -48,7 +48,7 @@ our $QRTRUE             = qr/\A(?!$QRFALSE)/    ;
 sub _insert {
     
     
-    
+    return 1;
 }; ## _insert
 
 #=========# INTERNAL ROUTINE
