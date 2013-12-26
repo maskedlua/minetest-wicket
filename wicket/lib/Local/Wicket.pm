@@ -31,6 +31,46 @@ our $QRTRUE             = qr/\A(?!$QRFALSE)/    ;
 ## pseudo-globals
 #----------------------------------------------------------------------------#
 
+#=========# INTERNAL ROUTINE
+#
+#~     _insert({       # insert this user directly into the wiki database
+#~         username    => $username,   # (game) user to insert
+#~         password    => $password,   # temporary password given to game user
+#~         dbname      => $dbname,     # name of the wiki's MySQL DB
+#~         dbuser      => $dbuser,     # same as the wiki's DB user
+#~         dbpass      => $dbpass,     # DB password for above
+#~         dbtable     => $dbtable,    # name of the "user" table
+#~     });
+#       
+# Pass named parms in a hashref.
+# Host 'localhost' is assumed.
+# 
+sub _insert {
+    
+    
+    
+}; ## _insert
+
+#=========# INTERNAL ROUTINE
+#
+#   _do_();     # short
+#       
+# Purpose   : ____
+# Parms     : ____
+# Reads     : ____
+# Returns   : ____
+# Writes    : ____
+# Throws    : ____
+# See also  : ____
+# 
+# ____
+# 
+sub _do_ {
+    
+    
+    
+}; ## _do_
+
 
 
 ## END MODULE
