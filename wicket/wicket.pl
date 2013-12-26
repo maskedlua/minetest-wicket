@@ -86,9 +86,9 @@ $dbh->do( $statement );
 # Set password.
 $statement  = qq{UPDATE $dbtable SET user_password=}
             .  q{md5(concat(user_id,'-',md5('}
-            . $password
+            . $dbh->quote($password)
             .  q{'))) WHERE user_name ='}
-            . $username
+            . $dbh->quote($username)
             .  q{'}
             ;
 $dbh->do( $statement );
