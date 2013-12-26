@@ -52,10 +52,12 @@ my $dbname          = 'athens';
 my $dbhost          = 'localhost';
 my $dbuser          = 'wiki';
 #~ my $dbpass            ;
+my $dbtable         = 'athensuser';
 
 my $dsn             = "DBI:mysql:database=$dbname;host=$dbhost";
 my $dbh             ;
 my $sth             ;
+my $statement       ;
 
 
     # Test insert the user and set password.
@@ -63,14 +65,33 @@ my $sth             ;
 # Connect to the DB.
 $dbh = DBI->connect( $dsn, $dbuser, $dbpass );
 
-# Test query (ripped from DBD::mysql POD).
-$sth    = $dbh->prepare("SELECT * FROM athensuser");
-$sth->execute();
-while (my $ref = $sth->fetchrow_hashref()) {
-    print "Found a row: id = $ref->{'user_id'}, name = $ref->{'user_name'}\n";
-}
-$sth->finish();
+#~ # Test query (ripped from DBD::mysql POD).
+#~ $sth    = $dbh->prepare("SELECT * FROM athensuser");
+#~ $sth->execute();
+#~ while (my $ref = $sth->fetchrow_hashref()) {
+#~     print "Found a row: id = $ref->{'user_id'}, name = $ref->{'user_name'}\n";
+#~ }
+#~ $sth->finish();
 
+# Compose insert. 
+$statement  = qq{INSERT INTO $dbtable VALUES (}
+            ( join q{,},
+                '0',                            # user_id (auto_increment)
+                $username,                      # user_name
+            )
+            .  q{)}
+            ;
+$dbh->do( $statement );
+
+# Set password.
+$statement  = qq{UPDATE $dbtable SET user_password=}
+            .  q{md5(concat(user_id,'-',md5('}
+            . $password
+            .  q{'))) WHERE user_name ='}
+            . $username
+            .  q{'}
+            ;
+$dbh->do( $statement );
 
 $dbh->disconnect();
 say "Done.";
