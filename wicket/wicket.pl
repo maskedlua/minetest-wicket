@@ -78,7 +78,7 @@ $statement  = qq{INSERT INTO $dbtable VALUES (}
             . ( 
             join q{,},
                 '0',                            # user_id (auto_increment)
-                $username,                      # user_name
+                $dbh->quote($username),         # user_name
             )
             .  q{)}
             ;
