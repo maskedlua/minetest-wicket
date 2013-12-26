@@ -14,10 +14,9 @@ Getopt::Long::Configure ("bundling");       # enable, for instance, -xyz
 use Pod::Usage;                             # Build help text from POD
 use Pod::Find qw{pod_where};                # POD is in ...
 
+# Modules standard with wheezy
 use DBI 1.616;          # Generic interface to a large number of databases
 use DBD::mysql;         # DBI driver for MySQL
-use DBIx::Connector;    # Fast, safe DBI connection and transaction management
-use DBIx::Connector::Driver::SQLite;    # SQLite-specific connection interface
 
 
 # Disabled
@@ -30,20 +29,55 @@ use DBIx::Connector::Driver::SQLite;    # SQLite-specific connection interface
 #~ use Devel::Comments '###';
 #~ use Devel::Comments '###', ({ -file => 'debug.log' });                   #~
 
+#~ use DBIx::Connector; # Fast, safe DBI connection and transaction management
+#~ use DBIx::Connector::Driver::SQLite; # SQLite-specific connection interface
+
+
 ## use
 #============================================================================#
 say "$0 Running...";
 
+# Quickie grab from command line for security.
+my @grab            = @ARGV;
+my $dbpass            = $grab[0];
+
+
+# Test constants.
+my $indent          = q{ } x 4;
+
 my $username        = 'Foo';
 my $password        = 'barmeno';
 
-# Test insert the user and set password.
+my $dbname          = 'athens';
+my $dbhost          = 'localhost';
+my $dbuser          = 'wiki';
+#~ my $dbpass            ;
+
+my $dsn             = "DBI:mysql:database=$dbname;host=$dbhost";
+my $dbh             ;
+
+#~     # Probe.
+#~ my @drivers         = DBI->available_drivers();
+#~ say 'Drivers:';
+#~ for my $driver (@drivers) {
+#~     say $driver;
+#~     my @sources         = DBI->data_sources($driver);
+#~     for my $source (@sources) {
+#~         say $indent . $source;
+#~     };
+#~     say q{};
+#~ };
+#~ say q{};
+
+
+    # Test insert the user and set password.
+
+# Connect to the DB.
+$dbh = DBI->connect( $dsn, $dbuser, $dbpass );
 
 
 
-
-
-
+$dbh->disconnect();
 say "Done.";
 exit;
 #----------------------------------------------------------------------------#
