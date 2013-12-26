@@ -14,6 +14,9 @@ Getopt::Long::Configure ("bundling");       # enable, for instance, -xyz
 use Pod::Usage;                             # Build help text from POD
 use Pod::Find qw{pod_where};                # POD is in ...
 
+use Digest::MD5 qw(md5 md5_hex md5_base64);     # MD5 hashing
+
+
 # Modules standard with wheezy
 use DBI 1.616;          # Generic interface to a large number of databases
 use DBD::mysql;         # DBI driver for MySQL
@@ -47,6 +50,7 @@ my $indent          = q{ } x 4;
 
 my $username        = 'Foo';
 my $password        = 'barmeno';
+my $hashed          ;
 
 my $dbname          = 'athens';
 my $dbhost          = 'localhost';
@@ -65,18 +69,17 @@ my $statement       ;
 # Connect to the DB.
 $dbh = DBI->connect( $dsn, $dbuser, $dbpass );
 
-#~ # Test query (ripped from DBD::mysql POD).
-#~ $sth    = $dbh->prepare("SELECT * FROM athensuser");
-#~ $sth->execute();
-#~ while (my $ref = $sth->fetchrow_hashref()) {
-#~     print "Found a row: id = $ref->{'user_id'}, name = $ref->{'user_name'}\n";
-#~ }
-#~ $sth->finish();
+# Hash the password. See: 
+#   https://www.mediawiki.org/wiki/Manual:User_table#user_password
+my $salt    = sprintf "%08x", ( int( rand() * 2**31 ) );
+$hashed     = md5_hex( $password );
+$hashed     = md5_hex( $salt . q{-} . $hashed );
+$hashed     = q{:B:} . $salt . q(:) . $hashed  ;
 
 # Compose insert. 
 $statement  = qq{INSERT INTO $dbtable }
-            . q{(user_id, user_name) }
-            . q{VALUES (}
+            .  q{(user_id, user_name) }
+            .  q{VALUES (}
             .  q{'0',}                          # user_id (auto_increment)
             . $dbh->quote($username)            # user_name
             .  q{)}
@@ -85,9 +88,8 @@ $dbh->do( $statement );
 
 # Set password.
 $statement  = qq{UPDATE $dbtable SET user_password=}
-            .  q{md5(concat(user_id,'-',md5(}
-            . $dbh->quote($password)
-            .  q{))) WHERE user_name =}
+            . $dbh->quote($hashed)
+            .  q{ WHERE user_name =}
             . $dbh->quote($username)
             ;
 $dbh->do( $statement );
