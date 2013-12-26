@@ -4,8 +4,8 @@ use warnings;
 use Test::More;
 
 use Local::Wicket;
-my $QRTRUE       = $Error::Base::QRTRUE    ;
-my $QRFALSE      = $Error::Base::QRFALSE   ;
+my $QRTRUE       = $Local::Wicket::QRTRUE    ;
+my $QRFALSE      = $Local::Wicket::QRFALSE   ;
 
 #----------------------------------------------------------------------------#
 # insert.t
@@ -71,7 +71,7 @@ for (@td) {
         my $want        = $t{-want};
         
         $diag           = 'execute';
-        @rv             = eval{ Local::Wicket: _insert(@args) };
+        @rv             = eval{ Local::Wicket::_insert(@args) };
         pass( $diag );          # test didn't blow up
 #~         note($@) if $@;         # did code under test blow up?
         
