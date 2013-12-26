@@ -3,6 +3,10 @@ use warnings;
 
 use Test::More;
 
+# Modules standard with wheezy
+use DBI 1.616;          # Generic interface to a large number of databases
+use DBD::mysql;         # DBI driver for MySQL
+
 use Local::Wicket;
 my $QRTRUE       = $Local::Wicket::QRTRUE    ;
 my $QRFALSE      = $Local::Wicket::QRFALSE   ;
@@ -10,16 +14,22 @@ my $QRFALSE      = $Local::Wicket::QRFALSE   ;
 #----------------------------------------------------------------------------#
 # insert.t
 #
-# Create a test database and do a test user insert.
+# Create a test database table and do a test user insert.
+#
+# NOTE: For script to pass a test configuration must be created manually.
+#   $ mysql -u root -p
+#   mysql> CREATE USER 'testuser'@'localhost' IDENTIFIED BY 'testpass';
+#   mysql> GRANT ALL ON test.* TO 'testuser'@'localhost';
+#
 #----------------------------------------------------------------------------#
-# SETUP
+# CONSTANTS
 my $username    = 'Joe';                # (game) user to insert
 my $password    = 'flimflam';           # temporary password given to user
 my $dbname      = 'test';               # name of the wiki's MySQL DB
-my $dbuser      = 'testdbuser';         # same as the wiki's DB user
-my $dbpass      = 'testdbpass';         # DB password for above
-my $dbtable     = 'test_users';         # name of the "user" table
-
+my $dbuser      = 'testuser';           # same as the wiki's DB user
+my $dbpass      = 'testpass';           # DB password for above
+my $dbtable     = 'test_table';         # name of the "user" table
+my $dbh         ;                       # must keep handle global!
 
 #----------------------------------------------------------------------------#
 # CASES
@@ -28,6 +38,33 @@ my @td  = (
     {
         -case   => 'null',
         -like   => $QRTRUE,
+    },
+    
+    {
+        -case   => 'setup',     # must come first!
+        -code   => q[
+            note 'Setting up...';
+            my $errno       ;
+            my $dbhost      = 'localhost';
+            my $dsn         = "DBI:mysql:database=$dbname;host=$dbhost";
+            $dbh            = DBI->connect( $dsn, $dbuser, $dbpass,
+                                { RaiseError => 1 }
+                            );
+            $dbh->do(qq[DROP TABLE IF EXISTS $dbtable]);
+            my $statement   = qq{CREATE TABLE $dbtable}
+                            .  q{(}
+                            .  q{ user_id INT(10) UNSIGNED }
+                            .  q{PRIMARY KEY SERIAL DEFAULT VALUE }
+                            .  q{,}
+                            .  q{ user_name VARCHAR(255) UNIQUE }
+                            .  q{)}
+                            ;
+            $dbh->do($statement);
+            $errno = $dbh->{'mysql_errno'};
+            return $errno if $errno;
+            return 0;   # OK
+        ],
+        -need   => 0,
     },
     
     {
@@ -44,17 +81,30 @@ my @td  = (
     },
     
     {
-        -case   => 'Freddy',
-        -args   => [ 
-            username    => $username,   # 
-            password    => $password,   # 
-            dbname      => $dbname,     # 
-            dbuser      => 'Freddy',    # BAD
-            dbpass      => $dbpass,     # 
-            dbtable     => $dbtable,    # 
+        -case   => 'query select',
+        -code   => q[
+            my $sth;
+            $sth = $dbh->prepare("SELECT * FROM $dbtable");
+            $sth->execute();
+            while ( my $ref = $sth->fetchrow_hashref() ) {
+                note( "Row: $ref->{'user_id'}, $ref->{'user_name'}" );
+            }
+            $sth->finish();
         ],
-        -die    => words(qw/ error /),
     },
+    
+#~     {
+#~         -case   => 'Freddy',
+#~         -args   => [ 
+#~             username    => $username,   # 
+#~             password    => $password,   # 
+#~             dbname      => $dbname,     # 
+#~             dbuser      => 'Freddy',    # BAD
+#~             dbpass      => $dbpass,     # 
+#~             dbtable     => $dbtable,    # 
+#~         ],
+#~         -die    => words(qw/ error /),
+#~     },
     
 #~     {
 #~         -case   => 'two',
@@ -101,9 +151,15 @@ for (@td) {
         my $die         = $t{-die};     # must fail
         my $like        = $t{-like};    # regex supplied
         my $need        = $t{-need};    # exact return value supplied
+        my $code        = $t{-code};    # execute this code instead
         
         $diag           = 'execute';
-        @rv             = eval{ Local::Wicket::_insert(@args) };
+        if ($code) {
+            @rv             = eval "$code" ;
+        }
+        else {
+            @rv             = eval{ Local::Wicket::_insert(@args) };
+        };
         pass( $diag );          # test didn't blow up
         my $err         = $@;
         note($err) if $err;     # did code under test blow up?
