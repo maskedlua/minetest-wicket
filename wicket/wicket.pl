@@ -8,11 +8,19 @@ use strict;
 use warnings;
 use version; our $VERSION = qv('0.0.0');
 
+# Core modules
 use Getopt::Long;                           # Parses command-line options
 Getopt::Long::Configure ("bundling");       # enable, for instance, -xyz
 use Pod::Usage;                             # Build help text from POD
 use Pod::Find qw{pod_where};                # POD is in ...
 
+use DBI 1.616;          # Generic interface to a large number of databases
+use DBD::mysql;         # DBI driver for MySQL
+use DBIx::Connector;    # Fast, safe DBI connection and transaction management
+use DBIx::Connector::Driver::SQLite;    # SQLite-specific connection interface
+
+
+# Disabled
 #~ use lib qw| lib |;
 #~ use Error::Base;
 #~ use Perl6::Form;
@@ -25,6 +33,14 @@ use Pod::Find qw{pod_where};                # POD is in ...
 ## use
 #============================================================================#
 say "$0 Running...";
+
+my $username        = 'Foo';
+my $password        = 'barmeno';
+
+# Test insert the user and set password.
+
+
+
 
 
 
