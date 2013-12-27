@@ -65,7 +65,9 @@ sub _insert {
     my $errno       ;   # MySQL or DBI/DBD error
     
     # Connect to the DB.
-    $dbh = DBI->connect( $dsn, $dbuser, $dbpass );
+    $dbh            = DBI->connect( $dsn, $dbuser, $dbpass,
+                    { PrintError => 0 }
+                    );
     die $err_connect if not ref $dbh;               # can't connect
     $errno = $dbh->{'mysql_errno'};
     die $errno if $errno;
