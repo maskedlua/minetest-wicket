@@ -44,31 +44,30 @@ my @td  = (
         -case   => 'setup',     # write a dummy config file
         -code   => q[
             note 'Writing dummy config...';
+            eval{ unlink $configfn if -f $configfn };
             open my $fh, '>', $configfn or die '80';
-            say {$fh} "dbname:  $dbname";
-            say {$fh} "dbuser:  $dbuser";
-            say {$fh} "dbpass:  $dbpass";
-            say {$fh} "dbtable: $dbtable";
-            close $fh or die $close_err;
+            say {$fh} "dbname:  $dbname"  ;
+            say {$fh} "dbuser:  $dbuser"  ;
+            say {$fh} "dbpass:  $dbpass"  ;
+            say {$fh} "dbtable: $dbtable" ;
+            close $fh or die '81';
             
             return 1;   # OK
         ],
         -need   => 1,
     },
     
-#~     {
-#~         -case   => 'Joe',
-#~         -args   => [{
-#~             username    => 'Joe',       # OK
-#~             password    => $password,   # 
-#~             dbname      => $dbname,     # 
-#~             dbuser      => $dbuser,     # 
-#~             dbpass      => $dbpass,     # 
-#~             dbtable     => $dbtable,    # 
-#~         }],
-#~         -like   => $QRTRUE,
-#~     },
-#~     
+    {
+        -case   => 'load',
+        -args   => [ $configfn ],
+        -deep   => {
+                    dbname  => $dbname  ,
+                    dbuser  => $dbuser  ,
+                    dbpass  => $dbpass  ,
+                    dbtable => $dbtable ,
+                },
+    },
+    
 #~     {
 #~         -case   => 'query select',
 #~         -code   => q[
@@ -143,7 +142,7 @@ my $want        ;
 
 # Extra-verbose dump optional for test script debug.
 my $Verbose     = 0;
-#~    $Verbose++;
+   $Verbose++;
 
 for (@td) {
     $tc++;
@@ -157,6 +156,7 @@ for (@td) {
         my $die         = $t{-die};     # must fail
         my $like        = $t{-like};    # regex supplied
         my $need        = $t{-need};    # exact return value supplied
+        my $deep        = $t{-deep};    # traverse structure (e.g., hashref)
         my $code        = $t{-code};    # execute this code instead
         
         $diag           = 'execute';
@@ -192,6 +192,12 @@ for (@td) {
             $got            = $rv[0];
             $want           = $need;
             is( $got, $want, $diag );
+        }
+        elsif ($deep) {
+            $diag           = 'return-is-deeply';
+            $got            = $rv[0];
+            $want           = $deep;
+            is_deeply( $got, $want, $diag );
         };
         
         # Extra-verbose dump optional for test script debug.
