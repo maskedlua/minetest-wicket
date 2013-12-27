@@ -129,6 +129,7 @@ sub _load {
     });
     
     $config = $rv->{$configfn};
+    die '83' if not ref $config or not keys $config;    # got nothing
     return $config;
 }; ## _load
 

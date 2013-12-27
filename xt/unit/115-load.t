@@ -68,64 +68,12 @@ my @td  = (
                 },
     },
     
-#~     {
-#~         -case   => 'query select',
-#~         -code   => q[
-#~             my $sth;
-#~             my @rv;
-#~             $sth = $dbh->prepare("SELECT * FROM $dbtable");
-#~             $sth->execute();
-#~             while ( my $ref = $sth->fetchrow_hashref() ) {
-#~                 push @rv, "$ref->{'user_id'}, $ref->{'user_name'}";
-#~             }
-#~             $sth->finish();
-#~             return @rv;
-#~         ],
-#~         -like   => words( '1', 'Joe' ),
-#~     },
-#~     
-#~     {
-#~         -case   => 'Suzy',
-#~         -args   => [{
-#~             username    => 'Suzy',      # OK
-#~             password    => $password,   # 
-#~             dbname      => $dbname,     # 
-#~             dbuser      => $dbuser,     # 
-#~             dbpass      => $dbpass,     # 
-#~             dbtable     => $dbtable,    # 
-#~         }],
-#~         -like   => $QRTRUE,
-#~     },
-#~     
-#~     {
-#~         -case   => 'query select',
-#~         -code   => q[
-#~             my $sth;
-#~             my @rv;
-#~             $sth = $dbh->prepare("SELECT * FROM $dbtable");
-#~             $sth->execute();
-#~             while ( my $ref = $sth->fetchrow_hashref() ) {
-#~                 push @rv, "$ref->{'user_id'}, $ref->{'user_name'}";
-#~             }
-#~             $sth->finish();
-#~             return @rv;
-#~         ],
-#~         -like   => words( '1', 'Joe', '2', 'Suzy' ),
-#~     },
-#~     
-#~     {
-#~         -case   => 'Evil Freddy',
-#~         -args   => [{
-#~             username    => $username,   # 
-#~             password    => $password,   # 
-#~             dbname      => $dbname,     # 
-#~             dbuser      => 'Freddy',    # BAD
-#~             dbpass      => $dbpass,     # 
-#~             dbtable     => $dbtable,    # 
-#~         }],
-#~         -die    => words(qw/ 70 /),
-#~     },
-        
+    {
+        -case   => 'bogus',
+        -args   => [ 'bogus.yaml' ],        # BAD no such file
+        -die    => words(qw/ 83 /),
+    },
+            
 );
 
 #----------------------------------------------------------------------------#
@@ -142,7 +90,7 @@ my $want        ;
 
 # Extra-verbose dump optional for test script debug.
 my $Verbose     = 0;
-   $Verbose++;
+#~    $Verbose++;
 
 for (@td) {
     $tc++;
