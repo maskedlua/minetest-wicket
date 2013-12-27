@@ -8,37 +8,23 @@ use strict;
 use warnings;
 use version; our $VERSION = qv('0.0.0');
 
-# Core modules
-use Getopt::Long;                           # Parses command-line options
-Getopt::Long::Configure ("bundling");       # enable, for instance, -xyz
-use Pod::Usage;                             # Build help text from POD
-use Pod::Find qw{pod_where};                # POD is in ...
+# Core module
+use lib qw| lib |;
 
-use Digest::MD5 qw(md5 md5_hex md5_base64);     # MD5 hashing
-
-
-# Modules standard with wheezy
-use DBI 1.616;          # Generic interface to a large number of databases
-use DBD::mysql;         # DBI driver for MySQL
-
-
-# Disabled
-#~ use lib qw| lib |;
-#~ use Error::Base;
-#~ use Perl6::Form;
-#~ use Test::More;
-#~ use Test::Trap;
-
-#~ use Devel::Comments '###';
-#~ use Devel::Comments '###', ({ -file => 'debug.log' });                   #~
-
-#~ use DBIx::Connector; # Fast, safe DBI connection and transaction management
-#~ use DBIx::Connector::Driver::SQLite; # SQLite-specific connection interface
-
+# Project module
+use Local::Wicket;
 
 ## use
 #============================================================================#
 say "$0 Running...";
+
+
+
+say "Done.";
+exit;
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+=pod
 
 # Quickie grab from command line for security.
 my @grab            = @ARGV;
@@ -61,7 +47,7 @@ my $dbtable         = 'athensuser';
 my $dsn             = "DBI:mysql:database=$dbname;host=$dbhost";
 my $dbh             ;
 my $sth             ;
-my $statement       ;
+my $stmt       ;
 
 
     # Test insert the user and set password.
@@ -77,22 +63,22 @@ $hashed     = md5_hex( $salt . q{-} . $hashed );
 $hashed     = q{:B:} . $salt . q(:) . $hashed  ;
 
 # Compose insert. 
-$statement  = qq{INSERT INTO $dbtable }
+$stmt  = qq{INSERT INTO $dbtable }
             .  q{(user_id, user_name) }
             .  q{VALUES (}
             .  q{'0',}                          # user_id (auto_increment)
             . $dbh->quote($username)            # user_name
             .  q{)}
             ;
-$dbh->do( $statement );
+$dbh->do( $stmt );
 
 # Set password.
-$statement  = qq{UPDATE $dbtable SET user_password=}
+$stmt  = qq{UPDATE $dbtable SET user_password=}
             . $dbh->quote($hashed)
             .  q{ WHERE user_name =}
             . $dbh->quote($username)
             ;
-$dbh->do( $statement );
+$dbh->do( $stmt );
 
 $dbh->disconnect();
 say "Done.";
