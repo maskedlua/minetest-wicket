@@ -47,7 +47,7 @@ my $dbtable         = 'athensuser';
 my $dsn             = "DBI:mysql:database=$dbname;host=$dbhost";
 my $dbh             ;
 my $sth             ;
-my $statement       ;
+my $stmt       ;
 
 
     # Test insert the user and set password.
@@ -63,22 +63,22 @@ $hashed     = md5_hex( $salt . q{-} . $hashed );
 $hashed     = q{:B:} . $salt . q(:) . $hashed  ;
 
 # Compose insert. 
-$statement  = qq{INSERT INTO $dbtable }
+$stmt  = qq{INSERT INTO $dbtable }
             .  q{(user_id, user_name) }
             .  q{VALUES (}
             .  q{'0',}                          # user_id (auto_increment)
             . $dbh->quote($username)            # user_name
             .  q{)}
             ;
-$dbh->do( $statement );
+$dbh->do( $stmt );
 
 # Set password.
-$statement  = qq{UPDATE $dbtable SET user_password=}
+$stmt  = qq{UPDATE $dbtable SET user_password=}
             . $dbh->quote($hashed)
             .  q{ WHERE user_name =}
             . $dbh->quote($username)
             ;
-$dbh->do( $statement );
+$dbh->do( $stmt );
 
 $dbh->disconnect();
 say "Done.";

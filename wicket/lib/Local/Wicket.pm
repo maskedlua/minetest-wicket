@@ -46,6 +46,57 @@ our $QRTRUE             = qr/\A(?!$QRFALSE)/    ;
 # Host 'localhost' is assumed.
 # 
 sub _insert {
+    my $argrf       = shift;
+    my $username    = $argrf->{ username    } || die '64';
+    my $password    = $argrf->{ password    } || die '65';
+    my $dbname      = $argrf->{ dbname      } || die '66';
+    my $dbhost      = 'localhost'           ;
+    my $dbuser      = $argrf->{ dbuser      } || die '67';
+    my $dbpass      = $argrf->{ dbpass      } || die '68';
+    my $dbtable     = $argrf->{ dbtable     } || die '69';
+    
+    my $hashed      ;   # password hash
+    
+    my $dsn         = "DBI:mysql:database=$dbname;host=$dbhost";
+    my $dbh         ;   # DB handle
+    my $stmt        ;   # SQL text
+    my $errno       ;   # MySQL or DBI/DBD error
+    
+    # Connect to the DB.
+    $dbh = DBI->connect( $dsn, $dbuser, $dbpass );
+    $errno = $dbh->{'mysql_errno'};
+    die $errno if $errno;
+
+    # Hash the password. See: 
+    #   https://www.mediawiki.org/wiki/Manual:User_table#user_password
+    my $salt    = sprintf "%08x", ( int( rand() * 2**31 ) );
+    $hashed     = md5_hex( $password );
+    $hashed     = md5_hex( $salt . q{-} . $hashed );
+    $hashed     = q{:B:} . $salt . q(:) . $hashed  ;
+
+    # Compose insert. 
+    $stmt   = qq{INSERT INTO $dbtable }
+            .  q{(user_id, user_name) }
+            .  q{VALUES (}
+            .  q{'0',}                          # user_id (auto_increment)
+            . $dbh->quote($username)            # user_name
+            .  q{)}
+            ;
+    $dbh->do( $stmt );
+    $errno = $dbh->{'mysql_errno'};
+    die $errno if $errno;
+
+    # Set password.
+    $stmt   = qq{UPDATE $dbtable SET user_password=}
+            . $dbh->quote($hashed)
+            .  q{ WHERE user_name =}
+            . $dbh->quote($username)
+            ;
+    $dbh->do( $stmt );
+    $errno = $dbh->{'mysql_errno'};
+    die $errno if $errno;
+
+    $dbh->disconnect();
     
     
     return 1;

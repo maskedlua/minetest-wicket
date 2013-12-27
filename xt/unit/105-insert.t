@@ -29,6 +29,9 @@ my $dbname      = 'test';               # name of the wiki's MySQL DB
 my $dbuser      = 'testuser';           # same as the wiki's DB user
 my $dbpass      = 'testpass';           # DB password for above
 my $dbtable     = 'test_table';         # name of the "user" table
+
+#----------------------------------------------------------------------------#
+# GLOBALS
 my $dbh         ;                       # must keep handle global!
 
 #----------------------------------------------------------------------------#
@@ -37,7 +40,7 @@ my $dbh         ;                       # must keep handle global!
 my @td  = (
     {
         -case   => 'null',
-        -like   => $QRTRUE,
+        -die    => $QRTRUE,
     },
     
     {
@@ -57,6 +60,8 @@ my @td  = (
                             .  q{PRIMARY KEY SERIAL DEFAULT VALUE }
                             .  q{,}
                             .  q{ user_name VARCHAR(255) UNIQUE }
+                            .  q{,}
+                            .  q{ user_password TINYBLOB NOT NULL }
                             .  q{)}
                             ;
             $dbh->do($statement);
@@ -69,14 +74,14 @@ my @td  = (
     
     {
         -case   => 'Joe',
-        -args   => [ 
+        -args   => [{
             username    => $username,   # 
             password    => $password,   # 
             dbname      => $dbname,     # 
             dbuser      => $dbuser,     # 
             dbpass      => $dbpass,     # 
             dbtable     => $dbtable,    # 
-        ],
+        }],
         -like   => $QRTRUE,
     },
     
