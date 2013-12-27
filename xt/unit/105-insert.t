@@ -23,6 +23,7 @@ my $QRFALSE      = $Local::Wicket::QRFALSE   ;
 #
 #----------------------------------------------------------------------------#
 # CONSTANTS
+
 my $username    = 'Joe';                # (game) user to insert
 my $password    = 'flimflam';           # temporary password given to user
 my $dbname      = 'test';               # name of the wiki's MySQL DB
@@ -32,6 +33,7 @@ my $dbtable     = 'test_table';         # name of the "user" table
 
 #----------------------------------------------------------------------------#
 # GLOBALS
+
 my $dbh         ;                       # must keep handle global!
 
 #----------------------------------------------------------------------------#
@@ -75,7 +77,7 @@ my @td  = (
     {
         -case   => 'Joe',
         -args   => [{
-            username    => $username,   # 
+            username    => 'Joe',       # OK
             password    => $password,   # 
             dbname      => $dbname,     # 
             dbuser      => $dbuser,     # 
@@ -98,41 +100,55 @@ my @td  = (
             $sth->finish();
             return @rv;
         ],
-        -like   => words( '1', $username ),
+        -like   => words( '1', 'Joe' ),
     },
     
-#~     {
-#~         -case   => 'Freddy',
-#~         -args   => [ 
-#~             username    => $username,   # 
-#~             password    => $password,   # 
-#~             dbname      => $dbname,     # 
-#~             dbuser      => 'Freddy',    # BAD
-#~             dbpass      => $dbpass,     # 
-#~             dbtable     => $dbtable,    # 
-#~         ],
-#~         -die    => words(qw/ error /),
-#~     },
+    {
+        -case   => 'Suzy',
+        -args   => [{
+            username    => 'Suzy',      # OK
+            password    => $password,   # 
+            dbname      => $dbname,     # 
+            dbuser      => $dbuser,     # 
+            dbpass      => $dbpass,     # 
+            dbtable     => $dbtable,    # 
+        }],
+        -like   => $QRTRUE,
+    },
     
-#~     {
-#~         -case   => 'two',
-#~         -args   => [ 0, 1 ],
-#~     },
-#~     
-#~     {
-#~         -case   => 'three',
-#~         -args   => [ qw/ a b c / ],
-#~         -die    => words(qw/ internal error unpaired /),
-#~     },
-#~     
-#~     {
-#~         -case   => 'four',
-#~         -args   => [ qw/ a b c d / ],
-#~     },
+    {
+        -case   => 'query select',
+        -code   => q[
+            my $sth;
+            my @rv;
+            $sth = $dbh->prepare("SELECT * FROM $dbtable");
+            $sth->execute();
+            while ( my $ref = $sth->fetchrow_hashref() ) {
+                push @rv, "$ref->{'user_id'}, $ref->{'user_name'}";
+            }
+            $sth->finish();
+            return @rv;
+        ],
+        -like   => words( '1', 'Joe', '2', 'Suzy' ),
+    },
     
+    {
+        -case   => 'Evil Freddy',
+        -args   => [{
+            username    => $username,   # 
+            password    => $password,   # 
+            dbname      => $dbname,     # 
+            dbuser      => 'Freddy',    # BAD
+            dbpass      => $dbpass,     # 
+            dbtable     => $dbtable,    # 
+        }],
+        -die    => words(qw/ 70 /),
+    },
+        
 );
 
 #----------------------------------------------------------------------------#
+# EXECUTE AND CHECK
 
 my $tc          ;
 my $base        = 'Local::Wicket: _insert ';
@@ -208,6 +224,7 @@ for (@td) {
 #----------------------------------------------------------------------------#
 # TEARDOWN
 
+$dbh->disconnect();
 done_testing($tc);
 exit 0;
 

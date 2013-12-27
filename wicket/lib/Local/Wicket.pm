@@ -55,6 +55,8 @@ sub _insert {
     my $dbpass      = $argrf->{ dbpass      } || die '68';
     my $dbtable     = $argrf->{ dbtable     } || die '69';
     
+    my $err_connect = 70;
+    
     my $hashed      ;   # password hash
     
     my $dsn         = "DBI:mysql:database=$dbname;host=$dbhost";
@@ -64,6 +66,7 @@ sub _insert {
     
     # Connect to the DB.
     $dbh = DBI->connect( $dsn, $dbuser, $dbpass );
+    die $err_connect if not ref $dbh;               # can't connect
     $errno = $dbh->{'mysql_errno'};
     die $errno if $errno;
 
